@@ -59,7 +59,9 @@ public class HW3_WeekdayCalculator {
      */
     public static void main(String[] args) {
         // TODO: Fill in some stuff that helps you test
-        // the program
+        // the program.  It might be nice to ask the user
+        // for a year/month/day as input, and to display
+        // the weekday your program calculates
     }
     
 }
