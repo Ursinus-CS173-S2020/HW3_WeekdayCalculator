@@ -32,14 +32,14 @@ public class HW3_WeekdayCalculatorTest {
      */
     @Test
     public void testGetCenturyAnchor1900() {
-        int century = 1900;
+        int century = 19;
         int expResult = 3; // 1900 is a Wednesday
         int result = HW3_WeekdayCalculator.getCenturyAnchor(century);
         assertEquals(expResult, result);
     }
     @Test
     public void testGetCenturyAnchor2000() {
-        int century = 2000;
+        int century = 20;
         int expResult = 2; // 2000 is a Tuesday
         int result = HW3_WeekdayCalculator.getCenturyAnchor(century);
         assertEquals(expResult, result);
