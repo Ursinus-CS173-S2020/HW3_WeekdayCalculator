@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<!-- Header !-->
+	<head>
+		<title>Ursinus CS 173: Introduction To Computer Science, Spring 2020</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!--[if lte IE 8]><script src="../../assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="../../assets/css/main.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="../../assets/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="../../assets/css/ie8.css" /><![endif]-->
+        <style>
+        .image_off, #home:hover .image_on{
+           display:none
+        }
+        .image_on, #home:hover .image_off{
+           display:block
+        }
+        </style>
+	</head>
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+								<header id="header">
+									<a href="../../index.html" class="logo"><strong>Ursinus CS 173: Introduction To Computer Science, Spring 2020</strong></a>
+								</header>
+<!-- End Header !-->
+
+							<!-- Content -->
+								<section>
+									<header class="main">
+										<h2>Assignment 3: Weekday Calculator (30 Points)</h2>
+                                        <h3><a href = "http://www.ctralie.com">Chris Tralie</a></h3>
+                                        <h3>Due Monday 2/17/2020</h3>
+                                    </header>
+
+									<div id="page-content">
+
+                                        <h2>Overview / Logistics</h2>
+										<p>
+                                            The purpose of this assignment is to get you practice with <code>if statements</code>, modular arithmetic, <code>methods</code> and <a href = "#test">testing</a> with a fun application which will seem like magic once it works.  
+                                        </p>
+
+                                        <p>
+                                        <a href = "https://github.com/Ursinus-CS173-S2020/HW3_WeekdayCalculator/archive/master.zip">Click here</a> to download the skeleton code for this assignment.  You will be editing <code>src/hw3_weekdaycalculator/HW3_WeekdayCalculator.java</code> and <code>test/hw3_weekdaycalculator/HW3_WeekdayCalculatorTest.java</code>.  
+                                        </p>
+                                        <p><a name = "readme">What to submit</a>: <b>When you are finished, you should submit these two files to Canvas.  Please also submit answers to the following as a comment on Canvas:</b>
+                                        </p>
+                                        <p>
+                                            <ul>
+                                                <li>Did you work with a buddy on this assignment?  If so, who?</li>
+                                                <li>
+                                                    Are you using up any grace points to buy lateness days?  If so, how many?
+                                                </li>
+                                                <li>
+                                                    Approximately how many hours it took you to finish this assignment (<i>I will not judge you for this at all...I am simply using it to gauge if the assignments are too easy or hard</i>)
+                                                </li>
+                                                <li>
+                                                    Your overall impression of the assignment. Did you love it, hate it, or were you neutral? One word answers are fine, but if you have any suggestions for the future let me know.
+                                                </li>
+                                                <li>
+                                                    Any other concerns that you have. For instance, if you have a bug that you were unable to solve but you made progress, write that here. The more you articulate the problem the more partial credit you will receive (fine to leave this blank)
+                                                </li>
+                                            </ul>
+                                        </p>
+
+                                    <h2>The Problem</h2>
+                                    <p>
+                                       In <a href = "../../Labs/Lab1">lab 1</a>, we saw that the orbit of the earth around the sun is slightly longer than 365 days (actually, more specifically, the <a href = "https://en.wikipedia.org/wiki/Tropical_year">tropical year</a> is just under 365.25 days), so we wrote a program in <a href = "../../Labs/Lab2_LeapYears">lab 2</a> to compute years that are used as <i>leap years</i> in to keep our calendar days in the <a href = "https://en.wikipedia.org/wiki/Gregorian_calendar">Gregorian Calendar</a> on track with the summer solstice.
+                                    </p>
+                                    
+                                    <p>
+                                        Now that we understand the calendar, we are ready to create a program that computes the weekday that any date falls on.  The date may be any day in the past, present or future.  To accomplish this, we will implement an algorithm invented by mathematician <a href = "https://en.wikipedia.org/wiki/John_Horton_Conway">John Conway</a> called the <a href = "https://en.wikipedia.org/wiki/Doomsday_rule">Doomsday Algorithm</a>.  This algorithm relies on the fact that there are a set of days every year (e.g. April 4th and June 6th) which always share the same weekday.  These days are referred to as <i>doomsdays</i>.  The weekday in question changes from year to year, though, so the challenge becomes to compute that day for a particular year, and then to find the nearest doomsday as a reference.  We will refer to this day of the week as "the doomsday" for a particular year, and we will refer to one of the doomsdays as "a doomsday" (e.g. 4/4 and 6/6).  For instance, in 2020, the doomsday is Saturday, so June 6 (a doomsday), 2020 is on a Saturday (we will discuss how to compute this day for any year <a href = "#doomsdayyear">momentarily</a>).  Therefore, if we want to know the date of June 4, 2020, we would count back by 2 to a Thursday.
+                                    </p>
+
+                                    <p>
+                                        Let's now look at the steps of the Doomsday Algorithm in more detail.  In the discussion below, we will use numbers from 0-6 in the place of weekdays.  In particular:
+
+                                        <h4><a name = "weekdayasnumber">Weekdays as numbers</a></h4>
+                                        <h5>
+                                        <table>
+                                            <tr><td>0</td><td>Sunday</td></tr>
+                                            <tr><td>1</td><td>Monday</td></tr>
+                                            <tr><td>2</td><td>Tuesday</td></tr>
+                                            <tr><td>3</td><td>Wednesday</td></tr>
+                                            <tr><td>4</td><td>Thursday</td></tr>
+                                            <tr><td>5</td><td>Friday</td></tr>
+                                            <tr><td>6</td><td>Saturday</td></tr>
+                                        </table>
+                                        </h5>
+                                    </p>
+
+                                    <p>
+                                        Your program will only need to return the number, but for extra credit you can use a switch statement on the number to print out the day.
+                                    </p>
+
+                                    <h3><a name = "doomsdayyear">1. Finding The Doomsday Weekday for A Particular Year</a></h3>
+
+                                    <p>
+                                        First, we need to figure out what day all of the doomsdays fall on for a particular year, which we refer to as that year's doomsday.  <i>These steps may seem like magic, and a proof is beyond the scope of this assignment, but if you follow them diligently, you will get perfectly correct answers</i>.
+                                    </p>
+
+                                    <h4><a name = "centuryanchor">Century Anchor</a></h4>
+                                    <p>
+                                        First, we need to find the "century anchor" for the doomsday.  This is a number between 0 and 6 that we add as an offset when figuring out the weekday for the year.  The century anchor is computed as follows:
+                                        <ol>
+                                            <li>
+                                                Let <code>c</code> be the floor of of the year divided by 100.  For example, for 1964, the century is 19 (you can get this with integer division, just as you got the number of buses on <a href = "../HW1">homework 1</a>).
+                                            </li>
+                                            <li>
+                                                Let <code>x</code> be <code>(c % 4)*5</code>
+                                            </li>
+                                            <li>
+                                                The <code>anchor</code> is then computed as <code>(x % 7 + 2) % 7</code>
+                                            </li>
+                                        </ol>
+                                    </p>
+
+                                    <h4>
+                                        <a name = "yeardoomsday">Finalizing Doomsday Year</a>
+                                    </h4>
+                                    <p>
+                                        Now we are ready to finalize the doomsday.  For this, we will use what's referred to as the "<a href = "https://en.wikipedia.org/wiki/Doomsday_rule#The_%22odd_+_11%22_method">Odd + 11</a> method.""  To carry it out, follow these steps in sequence:
+                                        <ol>
+                                            <li>
+                                                Compute the <code>anchor</code> as above
+                                            </li>
+                                            <li>
+                                                Let <code>T</code> be the 2-digit year (the remainder when dividing the year by 100).  For instance, for 1974, <code>T</code> is 74.
+                                            </li>
+                                            <li>
+                                                If <code>T</code> is odd, add 11
+                                            </li>
+                                            <li>
+                                                Let <code>T</code> be <code>T/2</code>
+                                            </li>
+                                            <li>
+                                                If <code>T</code> is odd, add 11.
+                                            </li>
+                                            <li>
+                                                Let <code>T</code> be <code>7 - T % 7</code>
+                                            </li>
+                                            <li>
+                                                The doomsday for the year is <code>(T + anchor) % 7</code>
+                                            </li>
+                                        </ol>
+
+                                        Steps 2-6 are shown in a flowchart on <a href = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Odd%2B11_doomsday_flowchart.svg/540px-Odd%2B11_doomsday_flowchart.svg.png">Wikipedia</a>.
+                                    </p>
+
+                                    <h3><a name = "weekday">2. Find The Weekday (Finally!!)</a></h3>
+
+                                    <p>
+                                        For a particular date, expressed as <code>month/day/year</code>, we are now ready to find the day of the week of that date, expressed as a <a href = "#weekdayasnumber">number</a>.  First, find the doomsday for the <code>year</code>, following the <a href = "#yeardoomsday">steps above</a>.  Call this <code>ydoomsday</code>.  Then, given the month, find a known doomsday in that month, and count either forward or backward to it.  In particular, the doomsdays for different months are shown in the table below.  There are certainly more days than this that fall on the doomsday, but these ones were chosen so they would be easy to remember (e.g. 7/11 and 11/7, 9/5 and 5/9, 4/4, 6/6, 8/8, 10/10, 12/12)
+
+                                        <h5>
+                                            <table>
+                                                <tr><td>January (1)</td><td>If it's a leap year, 1/4, otherwise, 1/3</td></tr>
+                                                <tr><td>February (2)</td><td>If it's a leap year, 2/29, otherwise, 2/28</td></tr>
+                                                <tr><td>March (3)</td><td>3/7</td></tr>
+                                                <tr><td>April (4)</td><td>4/4</td></tr>
+                                                <tr><td>May (5)</td><td>5/9</td></tr>
+                                                <tr><td>June (6)</td><td>6/6</td></tr>
+                                                <tr><td>July (7)</td><td>7/11</td></tr>
+                                                <tr><td>August (8)</td><td>8/8</td></tr>
+                                                <tr><td>September (9)</td><td>9/5</td></tr>
+                                                <tr><td>October (10)</td><td>10/10</td></tr>
+                                                <tr><td>November (11)</td><td>11/7</td></tr>
+                                                <tr><td>December (12)</td><td>12/12</td></tr>
+                                            </table>
+                                        </h5>
+
+                                        We refer to the day of the week these all fall on in a particular year as <code>ydoomsday</code>.  For instance, notice how in 2020, all of these days fall on a Saturday, so <code>ydoomsday = 6</code>.  (Check your calendar...this will blow your mind).  Call the particular day for a month <code>reference</code>.  For instance, <code>reference = 5</code> for September (you will have to hard code in the references to a series of if statements or a switch statement on the month).  Since we know that <code>reference</code> occurs on <code>ydoomsday</code>, we count back to <code>reference</code> from our <code>day</code> of the month.  Do this by creating a variable <BR><BR><code>diff = day - reference</code><BR><BR>Now add the year's doomsday offset <code>ydoomsday</code> to diff, and take the remainder after dividing by 7.  If this remainder is negative, add 7.  <b>This is the final answer!!</b>
+                                    </p>
+
+                                    <h3>Example 1</h3>
+                                    <p>
+                                        As an example, let's consider the day this assignment is due, <b>2/17/2020</b>.  As we discussed, the doomsday <code>ydoomsday</code> for 2020 is <b>6</b> (we could get this by the <a href = "#doomsdayyear">steps above</a>).  We're on a leap year in February, so the day <code>reference</code> is <b>29</b>.  Then, <code>diff = 17 - 29 = -12</code>.  So we're 12 days before a Saturday.  In code, <code>-12 % 7</code> is <b>-5</b>, which is negative, so we add 7 to it to get <b>2</b>.  By our <a href = "#weekdayasnumber">number to weekday table</a>, this is a Monday!  So our assignment is due on Monday, as usual.
+                                    </p>
+
+                                    <h3>Example 2</h3>
+                                    <p>
+                                        Consider the <a href = "https://en.wikipedia.org/wiki/Attack_on_Pearl_Harbor">attack on Pearl Harbor</a>, which took place on December 7, 1941.  First, we compute the <a href = "#centuryanchor">century anchor</a>:
+                                        <ol>
+                                            <li>c = 19</li>
+                                            <li>(19 % 4)*5 is <b>15</b></li>
+                                            <li>(15 % 7 + 2) % 7 is <b>3</b></li>
+                                        </ol>
+
+                                        So the century anchor for the 1900s is 3, or <i>Tuesday</i>.  Now, let's compute the <a href = "#yeardoomsday">year offset</a>. 
+                                        <ol>
+                                            <li><code>T = 41</code></li>
+                                            <li>41 is odd, so set <code>T = 41 + 11 = 52</code></li>
+                                            <li><code>T = 52/2 = 26</code></li>
+                                            <li><code>26</code> is not odd, so leave it as is</li>
+                                            <li><code>T = 7 - 26 % 7</code>, which is <b>2</b></li>
+                                        </ol>
+
+                                        Therefore, the <code>ydoomsday</code> for the 1941 year is <code>3+2</code>ydoomsday</code> or 5, a Friday.  Next, we find the <code>reference</code> for the month of December, which is <code>12</code>.  The <code>reference</code> 12/12 of Friday is 5 days after our date of 12/7, so 12/7 must have been a <b>Sunday</b>.  To see this following our <a href = "#weekday">procedure above</a>, we compute<BR>
+                                            <code>diff = 7 - 12 = -5</code>
+                                            <BR>
+                                        Since this is negative, we add 7 to it to get 2.  Then, we add 2 + 5 (the doomsday for 1941) to get 7, which is 0 mod 7, which is a Sunday.
+
+                                    </p>
+                                    
+
+                                    <h2>Programming Tasks (20 Points)</h2>
+
+                                    <p>
+                                        At a high level, your task is to compute the weekday of any date in the Gregorian calendar.  To do this, you should fill in three methods <code>HW3_WeekdayCalculator.java</code>.  <b>You should do them one at a time and test each method thoroughly before proceeding to the next</b>.  This is to get you to practice <i>modular code development</i>, in which you break a complex task down into lots of small little tasks, or modules, that match a specification.  In this assignment, there is no hope that <code>getDoomsdayYear</code> will work if <code>getCenturyAnchor</code> isn't working, and there is no hope that <code>getWeekday</code> will work if <code>getCenturyAnchor</code> isn't working.  More details are below:
+                                    </p>
+
+                                    <h3>1. <code><a name = "getCenturyAnchor">getCenturyAnchor(int c)</a></code> (5 Points)</h3>
+                                    <p>
+                                        You are given the skeleton of a method whose job it is to compute a <a href = "#centuryanchor">century anchor</a>, given the digits of a century <code>c</code>.  You should return a number between 0 and 6 corresponding to this century's anchor.
+                                    </p>
+
+                                    <h3>2. <code><a name = "getDoomsdayYear">getDoomsdayYear(int year)</a></code> (5 Points)</h3>
+                                    <p>
+                                        You should create a new method called <code>getDoomsdayYear</code> which takes as input a year, and which returns a number between 0 and 6 corresponding to the doomsday for that year.  A proper implementation of this method should call <code>getCenturyAnchor</code> at some point to help with the calculation.
+                                    </p>
+
+                                    <h3>3. <code><a name = "getWeekday">getWeekday(int year, int month, int day)</a></code> (10 Points)</h3>
+                                    <p>
+                                        You should create a new method called <code>getWeekday</code> which takes as input the year, month (from 1 to 12), and day of a particular date, and which returns a number between 0 and 6 corresponding to the <a href = "#weekdayasnumber">the number for the weekday</a> of that day.  A good implementation of this method should call <code>getDoomsdayYear</code> at some point.  You should also look up the doomsday corresponding to the current month with a series of if/else statements or with a switch statement.  You should use your <code>isALeapYear</code> function from <a href = "../../Labs/Lab2_LeapYears">lab 2</a> to check the special cases for January and February (feel free to copy and paste that function into this assignment).
+                                    </p>
+
+                                    <h3>Extra Credit (+2)</h3>
+                                    <p>
+                                        Create a method which takes as input a weekday as a number, and which returns a string corresponding to the actual day.  Use this method to output the day as a word to the console.
+                                    </p>
+                                    
+
+                                    <h2><a name = "test">Unit Tests (7 Points)</a></h2>
+                                    
+                                    <p>
+                                        As always, testing is an important part of software development, and you will be graded on the quality of the tests you come up with.  It is recommended that you create the tests as you are going along.  You will need to create three sets of unit tests in the file <code>tests/hw3_weekdaycalculator/HW3_WeekdayCalculatorTest.java</code>.  
+                                    <ol>
+                                        <li>
+                                            The first set is for <a href = "#getCenturyAnchor"><code>getCenturyAnchor</code></a>.  <b>You should add two centuries</b> other than 1900 and 2000, which are provided.  
+                                        </li>
+
+                                        <li>
+                                            The next set of tests is for <a href = "#getDoomsdayYear"><code>getDoomsdayYear</code></a>.  <b>You will need to add at least 3 years in three different centuries</b> in addition to 2020, which is already provided.  <a href = "https://en.wikipedia.org/wiki/Doomsday_rule#Doomsdays_for_some_contemporary_years">Click here</a> to see a bunch of examples of doomsdays for contemporary years.
+                                        </li>
+
+                                        <li>
+                                            Finally, you will need to test the most important method of all, <code><a href = "getWeekday">getWeekday</a></code>.  No test have been provided yet, but for the best coverage, you should add <b>at least 12 tests spanning 12 different months</b>.  You can start with Peal Harbor day as your December test and the assignment due date as your February test.  You may also want to add the day your were born, or some holiday some other year.
+                                        </li>
+                                    </ol>
+
+                                    <h2>Style (3 Points)</h2>
+                                    <p>
+                                        You must adhere to the style guide as you are writing your code.
+                                    </p>
+
+                                </div>
+						</div>
+					</div>
+
+					<!--LaTeX in Javascript!-->
+					<script src="../../../../jsMath/easy/load.js"></script>
+					<!--Syntax highlighting in Javascript!-->
+					<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shCore.js"></script>
+					<script type="text/javascript" src="../../../syntaxhighlighter/scripts/shBrushJScript.js"></script>
+					<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shBrushCpp.js"></script>
+					<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shBrushMatlabSimple.js"></script>
+					<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shBrushPython.js"></script>
+					<link type="text/css" rel="stylesheet" href="../../../../syntaxhighlighter/styles/shCoreDefault.css"/>
+					<script type="text/javascript">SyntaxHighlighter.all();</script>
+
+
+			
+            <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>		
+			
+            <!-- Start of StatCounter Code -->
+            <script type="text/javascript">
+            var sc_project=7309088; 
+            var sc_invisible=1; 
+            var sc_security="f655b56d"; 
+            </script>
+            <script type="text/javascript"
+            src="http://www.statcounter.com/counter/counter.js"></script>
+            <noscript><div class="statcounter"><a title="free hit counter"
+            href="http://statcounter.com/" target="_blank"><img class="statcounter"
+            src="http://c.statcounter.com/7309088/0/f655b56d/1/" alt="free hit
+            counter"></a></div></noscript>
+            <!-- End of StatCounter Code -->
+<!-- End Sidebar !-->
+
